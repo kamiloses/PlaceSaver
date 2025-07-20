@@ -17,7 +17,7 @@ public class PlacesController : ControllerBase
         _externalApiService = externalApiService;
     }
 
-    [HttpGet("preview")]
+    [HttpGet("preview")]//handler ktory wskazuje ze parametry niepoprawne czy cos
     public async Task<ActionResult<List<PlacePreviewResponse>>> GetPreviewPlaces(
         [FromQuery] double latitude,
         [FromQuery] double longitude,
@@ -27,8 +27,10 @@ public class PlacesController : ControllerBase
         [FromQuery] bool? openNow)
     {
         
-        var parameters = new PlaceSearchParameters { Latitude = latitude, Longitude = longitude, Radius = radius, Type = type, Keyword = keyword, OpenNow = openNow };
+        Console.Write("a " +type );
         
+        var parameters = new PlaceSearchParameters { Latitude = latitude, Longitude = longitude, Radius = radius, Type = type, Keyword = keyword, OpenNow = openNow };
+         
         var places = await _externalApiService.getPreviewPlacesAsync(parameters);
         return Ok(places);
     }

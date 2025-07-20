@@ -12,7 +12,7 @@ public class PlacePreviewResponse
     public string Name { get; set; }
 
     [JsonPropertyName("vicinity")]
-    public string Vicinity { get; set; }
+    public string Vicinity { get; set; } //todo jeszcze photo
 
     [JsonPropertyName("types")]
     public IEnumerable<string> Types { get; set; }
