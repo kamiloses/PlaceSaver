@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using PlaceSaver.Dto;
 using PlaceSaver.Dtos;
 using PlaceSaver.Services.Impl;
 
@@ -17,9 +18,18 @@ public class PlacesController : ControllerBase
     }
 
     [HttpGet("preview")]
-    public async Task<ActionResult<List<PlacePreviewResponse>>> GetPreviewPlaces()
+    public async Task<ActionResult<List<PlacePreviewResponse>>> GetPreviewPlaces(
+        [FromQuery] double latitude,
+        [FromQuery] double longitude,
+        [FromQuery] int  radius,
+        [FromQuery] string? type,
+        [FromQuery] string? keyword,
+        [FromQuery] bool? openNow)
     {
-        var places = await _externalApiService.getPreviewPlacesAsync();
+        
+        var parameters = new PlaceSearchParameters { Latitude = latitude, Longitude = longitude, Radius = radius, Type = type, Keyword = keyword, OpenNow = openNow };
+        
+        var places = await _externalApiService.getPreviewPlacesAsync(parameters);
         return Ok(places);
     }
 }

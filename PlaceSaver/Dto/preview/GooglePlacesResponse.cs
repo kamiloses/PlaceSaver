@@ -1,6 +1,6 @@
 ﻿namespace PlaceSaver.Dtos;
 
-public class GooglePlaceApiResponse
+public class GooglePlacesResponse
 {
     
     public List<PlacePreviewResponse> Results { get; set; }
