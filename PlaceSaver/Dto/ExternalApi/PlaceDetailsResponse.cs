@@ -1,8 +1,8 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace PlaceSaver.Dtos;
+namespace PlaceSaver.Dto;
 
-public class PlacePreviewResponse
+public class PlaceDetailsResponse
 {
     
     [JsonPropertyName("place_id")]

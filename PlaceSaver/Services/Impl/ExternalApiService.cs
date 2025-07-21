@@ -1,13 +1,13 @@
 ﻿using System.Globalization;
 using PlaceSaver.Dto;
-using PlaceSaver.Dtos;
+using PlaceSaver.Exceptions;
 
 namespace PlaceSaver.Services.Impl;
 
 public class ExternalApiService
 {
     private readonly HttpClient _httpClient;
-    private static readonly string URL = "https://maps.googleapis.com/maps/api/place/nearbysearch/json";
+    private static readonly string Url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json";
 
     public ExternalApiService(HttpClient httpClient)
     {
@@ -16,13 +16,10 @@ public class ExternalApiService
 
     public async Task<GooglePlacesResponse?> GetPreviewPlacesAsync(PlaceSearchParameters parameters)
     {
-        string apiKey = File.ReadAllText("key.txt").Trim();
-        string url = BuildGooglePlacesUrl(URL, apiKey, parameters);
-        Console.BackgroundColor = ConsoleColor.Red;
+        string url = BuildGooglePlacesUrl(Url, parameters);
 
         return await FetchAndHandlePreviewPlacesAsync(url);
 
-        //  return await _httpClient.GetFromJsonAsync<GooglePlacesResponse>(url);
     }
 
 
@@ -32,15 +29,18 @@ public class ExternalApiService
 
         if (response == null || (response.Status != "OK" && response.Status != "ZERO_RESULTS"))
         {
-            throw new Exception("No response from Google Places API"); // todo ExternalApiException
+            throw new ExternalApiException("No response from Google Places API");
         }
 
         return response;
     }
 
 
-    private static string BuildGooglePlacesUrl(string baseUrl, string apiKey, PlaceSearchParameters parameters)
+    private static string BuildGooglePlacesUrl(string baseUrl,PlaceSearchParameters parameters)
     {
+        string apiKey = File.ReadAllText("key.txt").Trim();
+
+        
         string location =
             $"{parameters.Latitude.ToString(CultureInfo.InvariantCulture)},{parameters.Longitude.ToString(CultureInfo.InvariantCulture)}";
 
