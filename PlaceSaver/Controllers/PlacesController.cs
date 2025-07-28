@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Mvc;
 using PlaceSaver.Dto;
 using PlaceSaver.Services.Impl;
 
@@ -16,11 +17,11 @@ public class PlacesController : ControllerBase
         _externalApiService = externalApiService;
     }
 
-    [HttpGet("preview")]//handler ktory wskazuje ze parametry niepoprawne czy cos ORAZ ZMIEN NAZWE PREVIEW
+    [HttpGet("search")]//todo zmien nazwe
     public async Task<ActionResult<List<PlaceDetailsResponse>>> GetPreviewPlaces(
-        [FromQuery] double latitude,
-        [FromQuery] double longitude,
-        [FromQuery] int  radius,
+        [FromQuery][Range(-90,90)] double latitude,
+        [FromQuery][Range(-180, 180)]  double longitude,
+        [FromQuery][Range(1, 50000)] int  radius,
         [FromQuery] string? type,
         [FromQuery] string? keyword,
         [FromQuery] bool? openNow)
