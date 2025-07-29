@@ -23,7 +23,7 @@ public class ExternalApiService
     }
 
 
-    private async Task<GooglePlacesResponse?> FetchAndHandlePreviewPlacesAsync(string url)
+    private async Task<GooglePlacesResponse?> FetchAndHandlePreviewPlacesAsync(string url)//todo popraw tego http
     {
         var response = await _httpClient.GetFromJsonAsync<GooglePlacesResponse>(url);
 
