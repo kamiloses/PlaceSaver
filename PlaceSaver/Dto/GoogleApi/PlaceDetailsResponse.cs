@@ -25,19 +25,8 @@ public class PlaceDetailsResponse
     [JsonPropertyName("user_ratings_total")]
     public int NumberOfRatings { get; set; }
 
-    public string? PhotoUrl
-    {
-        get
-        {
-            if (Photos != null && Photos.Count > 0)
-            {
-                string apiKey = File.ReadAllText("key.txt").Trim(); 
-                return $"https://maps.googleapis.com/maps/api/place/photo?maxwidth=800&photo_reference={Photos[0].PhotoReference}&key={apiKey}";
-            }
-
-            return null;
-        }
-    }
+    public string? PhotoUrl { get; set; }
+    
 
     public class Photo
     {

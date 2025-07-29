@@ -4,39 +4,59 @@ using PlaceSaver.Exceptions;
 
 namespace PlaceSaver.Services.Impl;
 
-public class ExternalApiService
+public class GooglePlacesService : IGooglePlacesService
 {
     private readonly HttpClient _httpClient;
     private static readonly string Url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json";
 
-    public ExternalApiService(HttpClient httpClient)
+    public GooglePlacesService(HttpClient httpClient)
     {
         _httpClient = httpClient;
     }
 
-    public async Task<GooglePlacesResponse?> GetPreviewPlacesAsync(PlaceSearchParameters parameters)
+    public async Task<GooglePlacesResponse?> GetPlacesAsync(PlaceSearchParameters parameters)
     {
         string url = BuildGooglePlacesUrl(Url, parameters);
+        var response = await FetchAndHandlePlacesAsync(url);
 
-        return await FetchAndHandlePreviewPlacesAsync(url);
+        if (response?.Results != null)
+        {
+            foreach (var place in response.Results)
+            {
+                if (place.Photos?.Count > 0)
+                {
+                    string photoReference = place.Photos[0].PhotoReference;
+                    place.PhotoUrl = BuildPhotoUrl(photoReference);
+                }
+            }
+        }
 
+        return response;
     }
 
+    
+    private string BuildPhotoUrl(string photoReference)
+    {
+        string apiKey = File.ReadAllText("key.txt").Trim();
+        
+        return $"https://maps.googleapis.com/maps/api/place/photo?maxwidth=800&photo_reference={photoReference}&key={apiKey}";
+    }
+    
 
-    private async Task<GooglePlacesResponse?> FetchAndHandlePreviewPlacesAsync(string url)//todo popraw tego http
+    public async Task<GooglePlacesResponse?> FetchAndHandlePlacesAsync(string url)
     {
         var response = await _httpClient.GetFromJsonAsync<GooglePlacesResponse>(url);
 
         if (response == null || (response.Status != "OK" && response.Status != "ZERO_RESULTS"))
         {
-            throw new ExternalApiException("No response from Google Places API");
+            throw new GoogleApiException("No response from Google Places API");
         }
 
         return response;
     }
 
 
-    private static string BuildGooglePlacesUrl(string baseUrl,PlaceSearchParameters parameters)
+    private  string BuildGooglePlacesUrl(string baseUrl,PlaceSearchParameters parameters)
     {
         string apiKey = File.ReadAllText("key.txt").Trim();
 
@@ -48,11 +68,11 @@ public class ExternalApiService
 
         if (!string.IsNullOrWhiteSpace(parameters.Keyword))
         {
-            parameters.Type = null;
+           
             url += $"&keyword={parameters.Keyword}";
         }
 
-        if (!string.IsNullOrWhiteSpace(parameters.Type))
+        if (!string.IsNullOrWhiteSpace(parameters.Type)&&string.IsNullOrWhiteSpace(parameters.Keyword))
         {
             url += $"&type={parameters.Type}";
         }

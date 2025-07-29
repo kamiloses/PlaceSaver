@@ -1,24 +1,26 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 using PlaceSaver.Dto;
+using PlaceSaver.Services;
 using PlaceSaver.Services.Impl;
 
 namespace PlaceSaver.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class PlacesController : ControllerBase
+public class GooglePlacesController : ControllerBase
 {
-    private readonly ExternalApiService _externalApiService;
+    private readonly IGooglePlacesService _googlePlacesService;
 
 //todo dodać sockety że ktoś w danym momencie własnie dodał do swojej listy zyczen dany zabytek itp
-    public PlacesController(ExternalApiService externalApiService)
-    {
-        _externalApiService = externalApiService;
-    }
+public GooglePlacesController(IGooglePlacesService googlePlacesService)
+{
+    _googlePlacesService = googlePlacesService;
+}
 
-    [HttpGet("search")]//todo zmien nazwe
-    public async Task<ActionResult<List<PlaceDetailsResponse>>> GetPreviewPlaces(
+
+[HttpGet("search")]
+    public async Task<ActionResult<List<PlaceDetailsResponse>>> SearchPlacesAsync(
         [FromQuery][Range(-90,90)] double latitude,
         [FromQuery][Range(-180, 180)]  double longitude,
         [FromQuery][Range(1, 50000)] int  radius,
@@ -30,7 +32,7 @@ public class PlacesController : ControllerBase
         
         var parameters = new PlaceSearchParameters { Latitude = latitude, Longitude = longitude, Radius = radius, Type = type, Keyword = keyword, OpenNow = openNow };
          
-        var places = await _externalApiService.GetPreviewPlacesAsync(parameters);
+        var places = await _googlePlacesService.GetPlacesAsync(parameters);
         return Ok(places);
     }
 }
