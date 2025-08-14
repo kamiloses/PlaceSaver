@@ -6,13 +6,15 @@ namespace PlaceSaver.Services.Impl;
 
 public class GooglePlacesService : IGooglePlacesService
 {
-    private readonly HttpClient _httpClient;
+
+    private readonly HttpClientWrapper _httpClient;
     private static readonly string Url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json";
 
-    public GooglePlacesService(HttpClient httpClient)
+    public GooglePlacesService(HttpClientWrapper httpClient)
     {
         _httpClient = httpClient;
     }
+
 
     public async Task<GooglePlacesResponse?> GetPlacesAsync(PlaceSearchParameters parameters)
     {
@@ -43,18 +45,51 @@ public class GooglePlacesService : IGooglePlacesService
     }
     
 
+    
+    
+    
+    
+    
+    
     public async Task<GooglePlacesResponse?> FetchAndHandlePlacesAsync(string url)
     {
-        var response = await _httpClient.GetFromJsonAsync<GooglePlacesResponse>(url);
-
-        if (response == null || (response.Status != "OK" && response.Status != "ZERO_RESULTS"))
+//"status": "REQUEST_DENIED" 200 status
+// "status": "INVALID_REQUEST" 200 stasus
+// "results": [], "status": "ZERO_RESULTS" 200 status
+        try
         {
-            throw new GoogleApiException("No response from Google Places API");
+        var response = await _httpClient.GetAsync(url);
+        if (!response.IsSuccessStatusCode)
+        { throw new GoogleApiException($"There was a problem connecting to the external API. Reason: {response.ReasonPhrase}"); }
+        
+        
+        
+        return await response.Content.ReadFromJsonAsync<GooglePlacesResponse>();
+        
         }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
+        }
+        
+        
+        // Console.WriteLine(googlePlacesData);
 
-        return response;
+        // if (googlePlacesData == null || (googlePlacesData.Status != "OK" && googlePlacesData.Status != "ZERO_RESULTS"))
+        // {
+        //     throw new GoogleApiException("No response from Google Places API");
+        // }
+        //
+        
+        
+        
+        
+        
+
+        // return googlePlacesData;
     }
-
+//todo wyjątek rzucany jak credentials jwt nie podane
 
     private  string BuildGooglePlacesUrl(string baseUrl,PlaceSearchParameters parameters)
     {
@@ -63,6 +98,8 @@ public class GooglePlacesService : IGooglePlacesService
         
         string location =
             $"{parameters.Latitude.ToString(CultureInfo.InvariantCulture)},{parameters.Longitude.ToString(CultureInfo.InvariantCulture)}";
+        
+        Console.BackgroundColor = ConsoleColor.Yellow;
 
         string url = $"{baseUrl}?location={location}&radius={parameters.Radius}&key={apiKey}";
 
@@ -81,6 +118,7 @@ public class GooglePlacesService : IGooglePlacesService
         {
             url += $"&opennow={parameters.OpenNow.Value.ToString().ToLower()}";
         }
+        Console.WriteLine("url "+ url);
 
         return url;
     }

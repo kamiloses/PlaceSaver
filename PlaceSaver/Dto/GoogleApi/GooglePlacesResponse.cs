@@ -14,5 +14,10 @@ public class GooglePlacesResponse
 
     [JsonPropertyName("error_message")]
     public string? ErrorMessage { get; set; }
-    
+
+
+    public override string ToString()
+    {
+        return $"{nameof(Results)}: {Results}, {nameof(Status)}: {Status}, {nameof(ErrorMessage)}: {ErrorMessage}";
+    }
 }
