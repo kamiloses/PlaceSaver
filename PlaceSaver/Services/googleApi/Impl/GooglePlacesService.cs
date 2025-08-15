@@ -1,16 +1,17 @@
 ﻿using PlaceSaver.Dto;
 
-namespace PlaceSaver.Services.Impl;
+namespace PlaceSaver.Services.GoogleApi.Impl;
 
 public class GooglePlacesService : IGooglePlacesService
 {
     
-    //TODO WSZEDZIE DODAĆ INTERFEJSY WSTRZYKIWANIE ZAMIAST IMPLEMENTACJI
-    private readonly GooglePlacesApiClient _googlePlacesApiClient;
-    private readonly GooglePlacesUrlBuilder _googlePlacesUrlBuilder;
+    
+    
+    private readonly IGooglePlacesApiClient _googlePlacesApiClient;
+    private readonly IGooglePlacesUrlBuilder _googlePlacesUrlBuilder;
     private static readonly string Url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json";
 
-    public GooglePlacesService(GooglePlacesApiClient googlePlacesApiClient, GooglePlacesUrlBuilder googlePlacesUrlBuilder)
+    public GooglePlacesService(IGooglePlacesApiClient googlePlacesApiClient, IGooglePlacesUrlBuilder googlePlacesUrlBuilder)
     {
         _googlePlacesApiClient = googlePlacesApiClient;
         _googlePlacesUrlBuilder = googlePlacesUrlBuilder;
@@ -25,9 +26,12 @@ public class GooglePlacesService : IGooglePlacesService
         {
             foreach (var place in response.Results)
             {
-                if (place.Photos.Count > 0)
+                if (place.Photos?.Count > 0)
                 {
                     string photoReference = place.Photos[0].PhotoReference;
+                    Console.BackgroundColor = ConsoleColor.Green;
+                    Console.WriteLine(photoReference);
+                    
                     place.PhotoUrl = _googlePlacesUrlBuilder.BuildPhotoUrl(photoReference);
                 }
             }

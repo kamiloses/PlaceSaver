@@ -1,7 +1,7 @@
 using System.Globalization;
 using PlaceSaver.Dto;
 
-namespace PlaceSaver.Services.Impl;
+namespace PlaceSaver.Services.GoogleApi.Impl;
 
 public class GooglePlacesUrlBuilder : IGooglePlacesUrlBuilder
 {
